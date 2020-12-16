@@ -27,7 +27,7 @@ svg .stroked.dim {
 }
 
 svg text {
-  fill:hsl(210, 50%, 50%);
+  fill:hsl(30, 50%, 50%);
 }
 code {
   white-space: pre;

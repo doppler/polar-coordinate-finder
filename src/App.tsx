@@ -1,7 +1,7 @@
 import './App.css';
 
 function App() {
-  const size = 1000;
+  const size = 512;
 
   const phi = 1 / (144 / 89);
   const center = size / 2;
@@ -22,19 +22,17 @@ function App() {
   return (
     <div className="App">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${size} ${size}`}>
-        {[r1, r2, r3].map(r => (
-          <circle className='transparent stroked' 
-            cx={center} cy={center} r={r} 
-          />
-        ))}
-
         {quintaAngles.map(a => (
           <g>
             <line className='stroked dim' x1={polarCoords(a, r3).x} y1={polarCoords(a, r3).y} x2={polarCoords(a, r1).x} y2={polarCoords(a, r1).y} />
-            <text x={polarCoords(a, r2).x} y={polarCoords(a, r2).y}>{a}</text>
+            <text dominantBaseline="middle" textAnchor="middle" x={polarCoords(a, r2).x} y={polarCoords(a, r2).y}>{a}</text>
           </g>
         ))}
-
+        {[r1, r2, r3].map(r => (
+          <circle className='transparent stroked' 
+          cx={center} cy={center} r={r} 
+          />
+          ))}
         <path className='transparent stroked'
           d={pentaAngles.map((a, i) => `
             ${i === 0 ? 'M ' : 'L '} 
@@ -43,7 +41,6 @@ function App() {
           `).join(' ') + ' Z' }
         />
       </svg>
-      {/* <code>{JSON.stringify({phi, center, r1, r2, r3, pentaAngles}, null, 2)}</code> */}
     </div>
   );
 }
