@@ -23,13 +23,13 @@ function App() {
     <div className="App">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${size} ${size}`}>
         {quintaAngles.map(a => (
-          <g>
+          <g key={a}>
             <line className='stroked dim' x1={polarCoords(a, r3).x} y1={polarCoords(a, r3).y} x2={polarCoords(a, r1).x} y2={polarCoords(a, r1).y} />
             <text dominantBaseline="middle" textAnchor="middle" x={polarCoords(a, r2).x} y={polarCoords(a, r2).y}>{a}</text>
           </g>
         ))}
         {[r1, r2, r3].map(r => (
-          <circle className='transparent stroked' 
+          <circle key={r} className='transparent stroked' 
           cx={center} cy={center} r={r} 
           />
           ))}
