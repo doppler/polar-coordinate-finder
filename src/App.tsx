@@ -31,7 +31,7 @@ function App() {
         {quintaAngles.map(a => (
           <g>
             <line className='stroked dim' x1={polarCoords(a, r3).x} y1={polarCoords(a, r3).y} x2={polarCoords(a, r1).x} y2={polarCoords(a, r1).y} />
-            <text x={polarCoords(a, r1).x} y={polarCoords(a, r1).y}>{a}</text>
+            <text x={polarCoords(a, r2).x} y={polarCoords(a, r2).y}>{a}</text>
           </g>
         ))}
 
