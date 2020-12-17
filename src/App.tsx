@@ -1,12 +1,13 @@
 import './App.css';
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 function App() {
 
   // const [mouseCoords, setMouseCoords] = useState({x: 0, y: 0, r: 0, a: 0, x2: 0, y2: 0 })
   const [closestAngle, setClosestAngle] = useState(0);
   const [closestRadius, setClosestRadius] = useState(0);
-  const [savedCoords, setSavedCoords] = useState({x: 0, y: 0});
+  const [savedCoords, setSavedCoords] = useState({x: 0, y: 0, xy: ""});
+  const savedCoordsRef = useRef<HTMLInputElement>(null)
 
   const size = 512;
 
@@ -15,6 +16,7 @@ function App() {
   const r1 = size / 2;
   const r2 = r1 * phi;
   const r3 = r1 * phi**2;
+  const r4 = r1 * phi**3;
 
   const pentaAngles = Array.from(Array(10)).map((_, i) => i * (360 / 10))
   const quintaAngles = Array.from(Array(30)).map((_, i) => i * (360 / 30))
@@ -27,7 +29,12 @@ function App() {
   }, [center])
 
   const handleClick = useCallback((event: React.MouseEvent<SVGSVGElement>) => {
-    setSavedCoords({x: polarCoords(closestAngle, closestRadius).x, y: polarCoords(closestAngle, closestRadius).y })
+    const x = polarCoords(closestAngle, closestRadius).x;
+    const y = polarCoords(closestAngle, closestRadius).y;
+    setSavedCoords({x, y, xy: `${x} ${y}` })
+    savedCoordsRef.current?.setAttribute('value', `${x} ${y}`)
+    savedCoordsRef.current?.select()
+    document.execCommand('copy')
   }, [closestAngle, closestRadius, polarCoords])
 
   const handleMouseMove = useCallback((event: React.MouseEvent<SVGSVGElement>) => {
@@ -44,7 +51,7 @@ function App() {
     setClosestAngle(quintaAngles.reduce((prev, curr) => {
       return (Math.abs(curr - a) < Math.abs(prev - a) ? curr : prev);
     }))
-    const radii = [r1, r2, r3];
+    const radii = [r1, r2, r3, r4];
     setClosestRadius(radii.reduce((prev, curr) => {
       return (Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev);
     }))
@@ -54,17 +61,18 @@ function App() {
     <div className="App">
       <output>
         <code>
-          {JSON.stringify({size, phi, center, r1, r2, r3, closestAngle, closestRadius, savedCoords}, null, 2)}
+          {JSON.stringify({size, phi, center, r1, r2, r3, r4, closestAngle, closestRadius, savedCoords}, null, 2)}
         </code>
+        <input ref={savedCoordsRef} value={savedCoords.xy} readOnly/>
       </output>
       <svg onClick={handleClick} onMouseMove={handleMouseMove} xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {quintaAngles.map(a => (
           <g key={a}>
-            <line className='stroked dim' x1={polarCoords(a, r3).x} y1={polarCoords(a, r3).y} x2={polarCoords(a, r1).x} y2={polarCoords(a, r1).y} />
+            <line className='stroked dim' x1={polarCoords(a, r4).x} y1={polarCoords(a, r4).y} x2={polarCoords(a, r1).x} y2={polarCoords(a, r1).y} />
             <text dominantBaseline="middle" textAnchor="middle" x={polarCoords(a, r2).x} y={polarCoords(a, r2).y}>{a}</text>
           </g>
         ))}
-        {[r1, r2, r3].map(r => (
+        {[r1, r2, r3, r4].map(r => (
           <circle key={r} className='transparent stroked' 
           cx={center} cy={center} r={r} 
           />
