@@ -8,7 +8,7 @@ function App() {
   const [closestRadius, setClosestRadius] = useState(0);
   const [savedCoords, setSavedCoords] = useState({x: 0, y: 0});
 
-  const size = 1000;
+  const size = 512;
 
   const phi = 1 / (144 / 89);
   const center = size / 2;
