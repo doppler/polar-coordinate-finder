@@ -9,17 +9,12 @@ function App() {
   const [savedCoords, setSavedCoords] = useState({x: 0, y: 0, xy: ""});
   const savedCoordsRef = useRef<HTMLInputElement>(null)
 
-  const size = 512;
+  const size = 1024;
 
-  const phi = 1 / (144 / 89);
   const center = size / 2;
-  const r1 = size / 2;
-  const r2 = r1 * phi;
-  const r3 = r1 * phi**2;
-  const r4 = r1 * phi**3;
+  const radii = Array.from(Array(18)).map((_, i) => center / 18 * (i+1))
 
-  const pentaAngles = Array.from(Array(10)).map((_, i) => i * (360 / 10))
-  const quintaAngles = Array.from(Array(30)).map((_, i) => i * (360 / 30))
+  const angles = Array.from(Array(60)).map((_, i) => i * (360 / 60))
 
   const polarCoords = useCallback((angle: number, radius: number) => {
     return {
@@ -48,43 +43,50 @@ function App() {
     if(y2 < 0) a = 180 + a
     if(x2 < 0 && y2 > 0) a = a = 360 + a;
     // setMouseCoords({x, y, r, a, x2, y2})
-    setClosestAngle(quintaAngles.reduce((prev, curr) => {
+    setClosestAngle(angles.reduce((prev, curr) => {
       return (Math.abs(curr - a) < Math.abs(prev - a) ? curr : prev);
     }))
-    const radii = [r1, r2, r3, r4];
+    // const radii = Array.from(Array(18)).map((_, i) => center / 18 * i)
     setClosestRadius(radii.reduce((prev, curr) => {
       return (Math.abs(curr - r) < Math.abs(prev - r) ? curr : prev);
     }))
-  }, [center, quintaAngles, r1, r2, r3])
+  }, [center, angles, radii])
 
   return (
     <div className="App">
       <output>
         <code>
-          {JSON.stringify({size, phi, center, r1, r2, r3, r4, closestAngle, closestRadius, savedCoords}, null, 2)}
+          {JSON.stringify({closestAngle, closestRadius, savedCoords}, null, 2)}
         </code>
         <input ref={savedCoordsRef} value={savedCoords.xy} readOnly/>
       </output>
       <svg onClick={handleClick} onMouseMove={handleMouseMove} xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {quintaAngles.map(a => (
+        {angles.map(a => (
           <g key={a}>
-            <line className='stroked dim' x1={polarCoords(a, r4).x} y1={polarCoords(a, r4).y} x2={polarCoords(a, r1).x} y2={polarCoords(a, r1).y} />
-            <text dominantBaseline="middle" textAnchor="middle" x={polarCoords(a, r2).x} y={polarCoords(a, r2).y}>{a}</text>
+            <line className='stroked dim' x1={polarCoords(a, radii[0]).x} y1={polarCoords(a, radii[0]).y} x2={polarCoords(a, radii[radii.length-1]).x} y2={polarCoords(a, radii[radii.length-1]).y} />
           </g>
         ))}
-        {[r1, r2, r3, r4].map(r => (
+        {radii.map(r => (
           <circle key={r} className='transparent stroked' 
           cx={center} cy={center} r={r} 
           />
-          ))}
-        <path className='transparent stroked'
-          d={pentaAngles.map((a, i) => `
-            ${i === 0 ? 'M ' : 'L '} 
-            ${polarCoords(a, a % 72 === 0 ? r1 : r3).x} 
-            ${polarCoords(a, a % 72 === 0 ? r1 : r3).y} 
-          `).join(' ') + ' Z' }
+        ))}
+        <path className="transparent stroked" 
+          d={`
+            M ${polarCoords(0, center).x} ${polarCoords(0, center).y} 
+            L ${polarCoords(120, center).x} ${polarCoords(120, center).y}
+            L ${polarCoords(240, center).x} ${polarCoords(240, center).y}
+            Z
+          `}
         />
-        {/* <line className="stroked" x1={center} y1={center} x2={mouseCoords.x} y2={mouseCoords.y} /> */}
+        <path className="transparent stroked" 
+          d={`
+            M ${polarCoords(60, center).x} ${polarCoords(60, center).y} 
+            L ${polarCoords(180, center).x} ${polarCoords(180, center).y}
+            L ${polarCoords(300, center).x} ${polarCoords(300, center).y}
+            Z
+          `}
+        />
         <line className="stroked bright" x1={center} y1={center} x2={polarCoords(closestAngle, closestRadius).x} y2={polarCoords(closestAngle, closestRadius).y} />
       </svg>
     </div>
